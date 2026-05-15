@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  
+  /* Definisi Warna Tema */
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-surface: var(--bg-surface);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+}
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-surface: #f8fafc;
+  --bg-panel: rgba(255, 255, 255, 0.7);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: rgba(0, 0, 0, 0.05);
+  --accent-color: #10b981;
+}
+
+.dark {
+  --bg-primary: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-panel: rgba(23, 23, 23, 0.7);
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --accent-color: #10b981;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased transition-colors duration-300;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    @apply rounded-3xl shadow-xl;
+  }
+
+  .btn-primary {
+    background-color: var(--accent-color);
+    @apply text-black font-black px-6 py-3 rounded-2xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/20;
+  }
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-radius: 16px !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
