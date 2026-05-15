@@ -2,6 +2,12 @@
 FROM node:22-slim AS build
 WORKDIR /app
 
+# Add build-time arguments for Vite
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+
 # Copy package files
 COPY package*.json ./
 RUN npm install
@@ -11,6 +17,7 @@ COPY . .
 
 # Build the application
 RUN npm run build
+
 
 # Stage 2: Serve
 FROM nginx:alpine
