@@ -32,12 +32,12 @@ async function getSmartCoordinates(address: string, city: string = "") {
           return { lat, lon, accuracy: layer.acc };
         }
       }
-    } catch (err) { continue; }
+    } catch { continue; }
   }
   return null;
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   try {
     const contentType = req.headers.get('content-type')
     let imgBuffer: ArrayBuffer | null = null
@@ -90,7 +90,13 @@ Deno.serve(async (req) => {
     Jika ini hanya kutipan nasihat, hadits, atau berita tanpa jadwal acara, tandai is_kajian: false.
     Jawab JSON: { is_kajian: boolean, title, speaker, date, time, location_name, city }.`
 
-    const messages = [{ role: 'user', content: [{ type: 'text', text: prompt }] }]
+    type MessageContent = 
+      | { type: 'text'; text: string } 
+      | { type: 'image_url'; image_url: { url: string } };
+
+    const messages: { role: string; content: MessageContent[] }[] = [
+      { role: 'user', content: [{ type: 'text', text: prompt }] }
+    ];
     if (imgBuffer) {
       messages[0].content.push({ type: 'image_url', image_url: { url: finalImageUrl } })
     } else if (rawText) {
@@ -130,6 +136,7 @@ Deno.serve(async (req) => {
 
     return new Response('Success', { status: 200 })
   } catch (err) {
-    return new Response('Error: ' + err.message, { status: 200 })
+    const error = err as Error;
+    return new Response('Error: ' + error.message, { status: 200 })
   }
 })

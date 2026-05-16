@@ -22,7 +22,7 @@ export function useEvents(
   const fetchEvents = useCallback(async () => {
     // Jika diperintahkan menunggu tapi lokasi belum ada, jangan lanjut.
     if (shouldWaitLocation && latitude === undefined) {
-      console.log('⏳ useEvents: Menunggu lokasi user...');
+      console.info('⏳ useEvents: Menunggu lokasi user...');
       return;
     }
 
@@ -33,7 +33,7 @@ export function useEvents(
       let data: Event[] | null = null;
 
       if (latitude !== undefined && longitude !== undefined) {
-        console.log(`📡 useEvents: Mencari radius ${radiusKm}km...`);
+        console.info(`📡 useEvents: Mencari radius ${radiusKm}km...`);
         const { data: rpcData, error: rpcError } = await supabase.rpc('search_events_v2', {
           user_lat: latitude,
           user_lon: longitude,
@@ -42,7 +42,7 @@ export function useEvents(
         if (rpcError) throw rpcError;
         data = rpcData as Event[];
       } else {
-        console.log('🌐 useEvents: Memuat data nasional (Global Mode)...');
+        console.info('🌐 useEvents: Memuat data nasional (Global Mode)...');
         const { data: tableData, error: tableError } = await supabase
           .from('events')
           .select('*')
@@ -55,10 +55,11 @@ export function useEvents(
       }
 
       setEvents(data ?? []);
-      console.log(`✅ useEvents: Berhasil memuat ${data?.length || 0} event.`);
-    } catch (err: any) {
-      console.error('❌ useEvents Error:', err.message || err);
-      setError(err.message || 'Gagal memuat data');
+      console.info(`✅ useEvents: Berhasil memuat ${data?.length || 0} event.`);
+    } catch (err) {
+      const error = err as Error;
+      console.error('❌ useEvents Error:', error.message || error);
+      setError(error.message || 'Gagal memuat data');
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ export function useEvents(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'events' },
         () => {
-          console.log('🔄 useEvents: Ada perubahan data, me-refresh...');
+          console.info('🔄 useEvents: Ada perubahan data, me-refresh...');
           fetchEvents();
         }
       )

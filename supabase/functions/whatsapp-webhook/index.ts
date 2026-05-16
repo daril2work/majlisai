@@ -8,7 +8,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
 const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   // Handle CORS for browser testing if needed
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*' } })
@@ -16,17 +16,17 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.text()
-    console.log('[Raw Body]', body)
+    console.info('[Raw Body]', body)
     
     if (!body) return new Response('Empty body', { status: 400 })
     
     const payload = JSON.parse(body)
-    console.log('[All Keys]', Object.keys(payload).join(', '))
+    console.info('[All Keys]', Object.keys(payload).join(', '))
     
     const sender = payload.sender || payload.pengirim
     const message = payload.message || payload.pesan
     const url = payload.url || payload.file || payload.image || payload.link || payload.attachment
-    const filename = payload.filename || payload.file_name
+    // const filename = payload.filename || payload.file_name
 
     console.info(`[Webhook] From: ${sender}, Msg: ${message}, URL: ${url ? 'Ada' : 'Kosong'}`)
 
@@ -108,7 +108,8 @@ Deno.serve(async (req) => {
     })
 
   } catch (err) {
-    console.error(`[Fatal Error]`, err)
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+    const error = err as Error;
+    console.error(`[Fatal Error]`, error)
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 })
   }
 })

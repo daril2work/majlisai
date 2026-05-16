@@ -14,7 +14,7 @@ export const Search: React.FC = () => {
   const [cityName, setCityName] = useState('');
 
   // Panggil useEvents hanya jika targetCoords sudah ada
-  const { events, loading: eventsLoading, refetch } = useEvents(
+  const { events, loading: eventsLoading } = useEvents(
     targetCoords?.lat, 
     targetCoords?.lon, 
     50, // Radius lebih kecil untuk pencarian kota agar lebih akurat (50km)
@@ -43,7 +43,7 @@ export const Search: React.FC = () => {
       } else {
         toast.error('Lokasi tidak ditemukan. Coba nama kota lain.');
       }
-    } catch (err) {
+    } catch {
       toast.error('Gagal mencari lokasi. Cek koneksi internet Anda.');
     } finally {
       setIsSearching(false);

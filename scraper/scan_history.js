@@ -4,10 +4,10 @@ import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config({ path: '../.env' });
 
-const apiId = 36686136;
-const apiHash = "d99b7acca1c7e43e79382d9cab053d7d";
+const apiId = parseInt(process.env.TELEGRAM_API_ID || '0');
+const apiHash = process.env.TELEGRAM_API_HASH || '';
 const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
-const webhookUrl = "https://dionpavjrstupazabtvf.supabase.co/functions/v1/telegram-webhook";
+const webhookUrl = process.env.WEBHOOK_URL || "";
 
 const targetChannels = (process.env.TELEGRAM_TARGET_CHANNELS || "")
   .split(",")
@@ -35,7 +35,7 @@ const targetChannels = (process.env.TELEGRAM_TARGET_CHANNELS || "")
         continue;
       }
 
-      const messages = await client.getMessages(target.entity, { limit: 50 }); // Perkecil limit untuk tes cepat
+      const messages = await client.getMessages(target.entity, { limit: 5 }); // Limit 5 sesuai permintaan untuk tes cepat
       console.log(`📦 Ditemukan ${messages.length} pesan. Memfilter gambar...`);
       
       let successCount = 0;

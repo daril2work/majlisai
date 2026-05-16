@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { useEvents } from '../hooks/useEvents';
 import { format } from 'date-fns';
@@ -17,7 +17,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-let DefaultIcon = L.icon({
+const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
   iconSize: [25, 41],
@@ -43,7 +43,7 @@ function ThemeTileLayer() {
 export const MapView: React.FC = () => {
   // MEMPERBAIKI DESTRUKTURISASI (Menambahkan error dan refetch)
   const { events, loading, error, refetch } = useEvents(undefined, undefined, 100, false); 
-  const [activeEvent, setActiveEvent] = useState<any>(null);
+  // const [activeEvent, setActiveEvent] = useState<any>(null);
 
   const defaultCenter: [number, number] = [-7.5, 110]; 
 
@@ -67,7 +67,7 @@ export const MapView: React.FC = () => {
               key={event.id} 
               position={[event.latitude, event.longitude]}
               eventHandlers={{
-                click: () => setActiveEvent(event),
+                // click: () => setActiveEvent(event),
               }}
             >
               <Popup className="custom-popup">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Search, Map as MapIcon, Settings, LogOut, Sun, Moon, Info } from 'lucide-react';
+import { Home, Search, Map as MapIcon, LogOut, Sun, Moon, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface NavRoute {
