@@ -80,8 +80,6 @@ let targetChannels = (process.env.TELEGRAM_TARGET_CHANNELS || "")
 
     if (targetChannels.length > 0) {
       console.log(`🎯 Fokus memantau ${targetChannels.length} channel: ${targetChannels.join(", ")}`);
-    } else {
-      console.log("🌐 Memantau SEMUA grup/channel.");
     }
 
     // Monitoring Koneksi (Keep-Alive) setiap 5 menit
@@ -99,21 +97,36 @@ let targetChannels = (process.env.TELEGRAM_TARGET_CHANNELS || "")
       const message = event.message;
       if (!message || !message.message) return;
 
-      // 🎮 REMOTE CONTROL LOGIC (Hanya respon jika Anda yang mengetik)
-      if (message.out && message.message.startsWith('/')) {
-        const cmd = message.message.toLowerCase().split(' ');
+      const sender = await message.getSender();
+      const senderId = sender?.id?.toString();
+      const myId = me.id.toString();
+
+      // LOG SEMUA PESAN UNTUK DEBUG
+      if (senderId === myId) {
+        console.log(`👤 [SAYA]: ${message.message}`);
+      } else {
+        const chat = await message.getChat();
+        console.log(`📢 [${chat.title || 'Private'}]: ${message.message.substring(0, 50)}...`);
+      }
+
+      // 🎮 REMOTE CONTROL LOGIC (Hanya jika pengirim adalah SAYA)
+      if (senderId === myId && message.message.startsWith('/')) {
+        console.log(`🛠 PERINTAH TERDETEKSI: ${message.message}`);
+        const cmd = message.message.toLowerCase().trim().split(' ');
         const mainCmd = cmd[0];
 
         if (mainCmd === '/status') {
-          const me = await client.getMe();
-          const { count } = await supabase.from('events').select('*', { count: 'exact', head: true });
-          const statusMsg = `🤖 *MajlisAI System Status*\n\n` +
-                          `✅ Scraper: ONLINE\n` +
-                          `👤 Account: ${me.firstName}\n` +
-                          `📊 Total Events: ${count}\n` +
-                          `🎯 Monitoring: ${targetChannels.length} channels\n` +
-                          `💓 Heartbeat: Active`;
-          await client.sendMessage('me', { message: statusMsg, parseMode: 'markdown' });
+          try {
+            const { count } = await supabase.from('events').select('*', { count: 'exact', head: true });
+            const statusMsg = `🤖 *MajlisAI System Status*\n\n` +
+                            `✅ Scraper: ONLINE\n` +
+                            `👤 User ID: ${myId}\n` +
+                            `📊 Total Events: ${count}\n` +
+                            `🎯 Monitoring: ${targetChannels.length} channels\n` +
+                            `💓 Heartbeat: Active`;
+            await client.sendMessage('me', { message: statusMsg, parseMode: 'markdown' });
+            console.log("✅ Balasan /status terkirim.");
+          } catch (e) { console.error("❌ Gagal balas /status:", e.message); }
           return;
         }
 
@@ -186,10 +199,10 @@ let targetChannels = (process.env.TELEGRAM_TARGET_CHANNELS || "")
           await updateStatus('error', `❌ Gagal proses teks: ${err.message}`);
         }
       }
-    }, new NewMessage({}));
+    }, new NewMessage({ outgoing: true, incoming: true }));
 
   } catch (err) {
-    console.error("❌ KRITIKAL ERROR:", err.message);
+    await updateStatus('error_critical', `❌ KRITIKAL ERROR: ${err.message}`);
     if (err.message.includes("AUTH_KEY_UNREGISTERED")) {
       console.error("👉 SOLUSI: Sesi Anda telah dihapus oleh Telegram. Harap jalankan ulang 'node scraper/login.js'.");
     }
