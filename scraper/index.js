@@ -4,7 +4,18 @@ import { NewMessage } from "telegram/events/index.js";
 import axios from "axios";
 import { createClient } from '@supabase/supabase-js';
 import dotenv from "dotenv";
+import http from "http";
+
 dotenv.config({ path: '../.env' });
+
+// Simple HTTP Health Check Server to prevent Free-Tier Sleep (e.g. Render / Koyeb)
+const PORT = process.env.PORT || '8080';
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('OK');
+}).listen(PORT, () => {
+  console.log(`🌐 Health check server listening on port ${PORT}`);
+});
 
 const apiId = parseInt(process.env.TELEGRAM_API_ID || '0');
 const apiHash = process.env.TELEGRAM_API_HASH || '';
